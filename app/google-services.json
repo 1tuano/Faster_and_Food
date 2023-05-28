@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "324976763776",
+    "firebase_url": "https://ifood-clone-54f2d-default-rtdb.firebaseio.com",
+    "project_id": "ifood-clone-54f2d",
+    "storage_bucket": "ifood-clone-54f2d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324976763776:android:7b92b14b8298440b68d765",
+        "android_client_info": {
+          "package_name": "com.gustec.fastandfood"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "324976763776-pujuoddjunis36clg3nt78qbnhp6ihf4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMswWPGDodr2gub5JBWI4LkK3_Vk161Zw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "324976763776-pujuoddjunis36clg3nt78qbnhp6ihf4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

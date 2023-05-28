@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Fast and Food</string>
+    <string name="email">Email</string>
+    <string name="senha">Senha</string>
+    <string name="logar">Logar</string>
+    <string name="cadastre_se">Cadastre-se</string>
+    <string name="acessar">Acessar</string>
+    <string name="usu_rio">Usuário</string>
+    <string name="empresa">Empresa</string>
+    <string name="novo_produto">Novo Produto</string>
+    <string name="configura_es">Configurações</string>
+    <string name="sair">Sair</string>
+</resources>
