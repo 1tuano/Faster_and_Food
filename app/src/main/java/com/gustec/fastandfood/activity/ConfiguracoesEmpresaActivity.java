@@ -1,16 +1,36 @@
 package com.gustec.fastandfood.activity;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.camera.core.AspectRatio;
+import androidx.camera.core.Camera;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.Preview;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
+import androidx.core.content.ContextCompat;
+
+import android.Manifest;
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.ImageDecoder;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -19,6 +39,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -31,11 +52,16 @@ import com.google.firebase.storage.UploadTask;
 import com.gustec.fastandfood.R;
 import com.gustec.fastandfood.databinding.ActivityConfiguracoesEmpresaBinding;
 import com.gustec.fastandfood.helper.ConfiguracaoFirebase;
+import com.gustec.fastandfood.helper.Permissao;
 import com.gustec.fastandfood.helper.UsuarioFirebase;
 import com.gustec.fastandfood.model.Empresa;
 import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
@@ -57,6 +83,13 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
     private String idUsuarioLogado;
     private String urlImagemSelecionada = "";
     private static final int SELECAO_GALERIA = 200;
+    private static final int SELECAO_CAMERA = 400;
+
+
+
+
+
+    String perfilCapaFoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +108,12 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
+
         FirebaseUser usuario = UsuarioFirebase.getUsuarioAtual();
         Uri url = usuario.getPhotoUrl();
-        
+
+
+
 
 
         //Configurações Toolbar
@@ -93,11 +129,15 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent i = new Intent();
+            /*    Intent i = new Intent();
                 i.setAction(Intent.ACTION_GET_CONTENT);
                 i.setType("image/*");
                 startActivityForResult(i, SELECAO_GALERIA);
 
+             */
+
+                perfilCapaFoto = "imagePerfil";
+                showImagePicDialog();
 
             }
 
@@ -105,10 +145,54 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
 
         /*Recuperar dados da empresa*/
         recuperarDadosEmpresa();
+
+
         
     }
 
+
+
     private void showImagePicDialog() {
+
+        String[] options = {"Camera", "Galeria"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        //titulo
+        builder.setTitle("Local da Imagem");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+
+                if (which == 0){
+
+                  
+                        abrirCamera();
+                    
+
+
+                }else if (which == 1){
+
+               
+                        abrirGaleria();
+                    
+                }
+            }
+        });
+        //criar e exibir o dialogo
+        builder.create().show();
+    }
+
+    private void abrirCamera() {
+
+        Intent iCamera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(iCamera, SELECAO_CAMERA);
+    }
+
+    private void abrirGaleria() {
+        Intent i = new Intent();
+        i.setAction(Intent.ACTION_GET_CONTENT);
+        i.setType("image/*");
+        startActivityForResult(i, SELECAO_GALERIA);
     }
 
     private void recuperarDadosEmpresa() {
@@ -213,7 +297,14 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
                                         localImagem
                                 );
                         break;
+
+                    case SELECAO_CAMERA:
+                        imagem = (Bitmap) data.getExtras().get("data");
+                        foto.setImageBitmap(imagem);
+                        break;
                 }
+
+
 
                 if( imagem != null){
                     binding.imagePerfilEmpresa.setImageBitmap(imagem);
@@ -225,7 +316,8 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
                     final StorageReference imagemRef = storageReference
                             .child("imagens")
                             .child("Empresas")
-                            .child(idUsuarioLogado + "jpeg");
+                            .child("perfil")
+                            .child(idUsuarioLogado + ".jpeg");
 
                     UploadTask uploadTask = imagemRef.putBytes( dadosImagem );
                     uploadTask.addOnFailureListener(new OnFailureListener() {
@@ -242,12 +334,16 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
                     imagemRef.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
                         @Override
                         public void onComplete(@NonNull Task<Uri> task) {
-                            Uri url = task.getResult();
+
+                            Task<Uri> uri = taskSnapshot.getStorage().getDownloadUrl();
+                            while(!uri.isComplete());
+                            //Uri url = task.getResult();
+                            Uri url = uri.getResult();
 
                             urlImagemSelecionada = String.valueOf(url);
 
                             Toast.makeText(ConfiguracoesEmpresaActivity.this,
-                                    "Imagem atualizada!",
+                                    "Clique em salvar para atualizar a imagem!",
                                     Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -265,6 +361,8 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
 
     }
 
+
+
     private void inicializarComponentes() {
 
 
@@ -274,6 +372,7 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
         editEmpresaTempo = findViewById(R.id.editEmpresaTempo);
         foto = findViewById(R.id.imagePerfilEmpresa);
         camera = findViewById(R.id.imageView3);
+
 
     }
 

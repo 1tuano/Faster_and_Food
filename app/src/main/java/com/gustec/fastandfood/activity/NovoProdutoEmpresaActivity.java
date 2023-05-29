@@ -28,6 +28,7 @@ import com.gustec.fastandfood.helper.UsuarioFirebase;
 import com.gustec.fastandfood.model.Produto;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 import java.util.Objects;
 
 public class NovoProdutoEmpresaActivity extends AppCompatActivity {
@@ -146,11 +147,13 @@ public class NovoProdutoEmpresaActivity extends AppCompatActivity {
                     imagem.compress(Bitmap.CompressFormat.JPEG, 70, baos);
                     byte[] dadosImagem = baos.toByteArray();
 
+                    String imagemId = idUsuarioLogado + new Date().getTime();
+
                     final StorageReference imagemRef = storageReference
                             .child("imagens")
                             .child("Empresas")
                             .child("produto")
-                            .child(idUsuarioLogado + "jpeg");
+                            .child(imagemId + "jpeg");
 
                     UploadTask uploadTask = imagemRef.putBytes( dadosImagem );
                     uploadTask.addOnFailureListener(new OnFailureListener() {

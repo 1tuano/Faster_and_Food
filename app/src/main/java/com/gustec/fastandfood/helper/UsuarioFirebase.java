@@ -45,5 +45,26 @@ public class UsuarioFirebase {
         }
     }
 
+    public static boolean atualizarFotoUsuario(Uri url){
 
+        try {
+            FirebaseUser user = getUsuarioAtual();
+            UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder()
+                    .setPhotoUri(url)
+                    .build();
+
+            user.updateProfile(profile).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (!task.isSuccessful()){
+                        Log.d("Perfil", "Erro ao atualizar foto de perfil.");
+                    }
+                }
+            });
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

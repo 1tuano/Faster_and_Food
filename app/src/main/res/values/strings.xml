@@ -10,4 +10,12 @@
     <string name="novo_produto">Novo Produto</string>
     <string name="configura_es">Configurações</string>
     <string name="sair">Sair</string>
+    <string name="ramo">Ramo: </string>
+    <string name="tempo_de_entrega">Tempo de entrega: </string>
+    <string name="nome_da_empresa">Nome da empresa</string>
+    <string name="taxa_de_entrega">Taxa de entrega: </string>
+    <string name="r_10">- R$ 10</string>
+    <string name="alimentos">Alimentos</string>
+    <string name="_25_30_min">25-30 min</string>
+    <string name="mais_taxa_de_entrega">\" taxa de entrega.\"</string>
 </resources>
