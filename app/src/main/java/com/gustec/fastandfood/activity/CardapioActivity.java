@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -311,7 +312,7 @@ public class CardapioActivity extends AppCompatActivity {
         builder.setTitle("Selecione um método de pagamento");
 
         CharSequence[] itens = new CharSequence[]{
-                "Dinheiro", "Máquina cartão"
+                "Dinheiro", "Máquina de cartão"
         };
         builder.setSingleChoiceItems(itens, 0, new DialogInterface.OnClickListener() {
             @Override
@@ -328,13 +329,18 @@ public class CardapioActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                String observacao = editObservacao.getText().toString();
-                pedidoRecuperado.setMetodoPagamento( metodoPagamento );
-                pedidoRecuperado.setObservacao( observacao );
-                pedidoRecuperado.setStatus("confirmado");
-                pedidoRecuperado.confimar();
-                pedidoRecuperado.remover();
-                pedidoRecuperado = null;
+                try {
+                    String observacao = editObservacao.getText().toString();
+                    pedidoRecuperado.setMetodoPagamento( metodoPagamento );
+                    pedidoRecuperado.setObservacao( observacao );
+                    pedidoRecuperado.setStatus("confirmado");
+                    pedidoRecuperado.confimar();
+                    pedidoRecuperado.remover();
+                    pedidoRecuperado = null;
+                }catch (Exception e){
+                    Toast.makeText(CardapioActivity.this, "Nenhum produto escolhido!", Toast.LENGTH_SHORT).show();
+                }
+
 
             }
         });
@@ -354,7 +360,6 @@ public class CardapioActivity extends AppCompatActivity {
         recyclerProdutosCardapio = findViewById(R.id.recyclerProdutosCardapio);
         imageEmpresaCardapio = findViewById(R.id.imageEmpresaCardapio);
         textNomeEmpresaCardapio = findViewById(R.id.textNomeEmpresaCardapio);
-
         textCarrinhoQtd = findViewById(R.id.textCarrinhoQtd);
         textCarrinhoTotal = findViewById(R.id.textCarrinhoTotal);
     }

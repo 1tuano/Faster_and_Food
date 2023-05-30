@@ -1,5 +1,6 @@
 package com.gustec.fastandfood.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -59,7 +60,7 @@ public class ConfiguracoesUsuarioActivity extends AppCompatActivity {
 
         usuarioRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if( dataSnapshot.getValue() != null ){
 
                     Usuario usuario = dataSnapshot.getValue(Usuario.class);
@@ -68,9 +69,8 @@ public class ConfiguracoesUsuarioActivity extends AppCompatActivity {
 
                 }
             }
-
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });

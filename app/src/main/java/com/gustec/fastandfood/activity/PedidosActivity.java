@@ -1,5 +1,6 @@
 package com.gustec.fastandfood.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,6 +12,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -96,43 +98,50 @@ public class PedidosActivity extends AppCompatActivity {
 
     private void recuperarPedidos() {
 
-        dialog = new SpotsDialog.Builder()
-                .setContext(this)
-                .setMessage("Carregando dados")
-                .setCancelable( false )
-                .build();
-        dialog.show();
-
         DatabaseReference pedidoRef = firebaseRef
                 .child("pedidos")
                 .child(idEmpresa);
 
-        Query pedidoPesquisa = pedidoRef.orderByChild("status")
-                .equalTo("confirmado");
 
-        pedidoPesquisa.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            Query pedidoPesquisa = pedidoRef.orderByChild("status")
+                    .equalTo("confirmado");
 
-                pedidos.clear();
-                if( dataSnapshot.getValue() != null ){
-                    for (DataSnapshot ds: dataSnapshot.getChildren()){
-                        Pedido pedido = ds.getValue(Pedido.class);
-                        pedidos.add(pedido);
+
+            dialog = new SpotsDialog.Builder()
+                    .setContext(this)
+                    .setMessage("Carregando dados")
+                    .setCancelable( false )
+                    .build();
+            dialog.show();
+
+
+            pedidoPesquisa.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    pedidos.clear();
+                    if( dataSnapshot.getValue() != null ){
+                        for (DataSnapshot ds: dataSnapshot.getChildren()){
+                            Pedido pedido = ds.getValue(Pedido.class);
+                            pedidos.add(pedido);
+                        }
+                        adapterPedido.notifyDataSetChanged();
+                        dialog.dismiss();
                     }
-                    adapterPedido.notifyDataSetChanged();
-                    dialog.dismiss();
+
                 }
 
-            }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                }
+            });
 
-            }
-        });
 
     }
+
+
+
 
     private void inicializarComponentes() {
         recyclerPedidos = findViewById(R.id.recyclerPedidos);

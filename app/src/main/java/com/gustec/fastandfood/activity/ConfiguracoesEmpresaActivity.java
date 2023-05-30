@@ -71,24 +71,15 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
     private EditText editEmpresaNome, editEmpresaCategoria, editEmpresaTempo, editEmpresaTaxa;
     private CircleImageView foto;
     private ImageView camera;
-
     Uri localImagem;
-
-
     FirebaseAuth auth;
     FirebaseUser user;
-
     private StorageReference storageReference;
     private DatabaseReference firebaseRef;
     private String idUsuarioLogado;
     private String urlImagemSelecionada = "";
     private static final int SELECAO_GALERIA = 200;
     private static final int SELECAO_CAMERA = 400;
-
-
-
-
-
     String perfilCapaFoto;
 
     @Override
@@ -96,7 +87,6 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityConfiguracoesEmpresaBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
 
         //Configurações iniciais
         inicializarComponentes();
@@ -107,14 +97,6 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-
-
-        FirebaseUser usuario = UsuarioFirebase.getUsuarioAtual();
-        Uri url = usuario.getPhotoUrl();
-
-
-
-
 
         //Configurações Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -129,28 +111,22 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-            /*    Intent i = new Intent();
-                i.setAction(Intent.ACTION_GET_CONTENT);
-                i.setType("image/*");
-                startActivityForResult(i, SELECAO_GALERIA);
-
-             */
-
                 perfilCapaFoto = "imagePerfil";
                 showImagePicDialog();
-
             }
-
+        });
+        camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                perfilCapaFoto = "imagePerfil";
+                showImagePicDialog();
+            }
         });
 
         /*Recuperar dados da empresa*/
         recuperarDadosEmpresa();
 
-
-        
     }
-
-
 
     private void showImagePicDialog() {
 
@@ -164,17 +140,9 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int which) {
 
                 if (which == 0){
-
-                  
                         abrirCamera();
-                    
-
-
                 }else if (which == 1){
-
-               
                         abrirGaleria();
-                    
                 }
             }
         });
@@ -203,7 +171,7 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
 
         empresaRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 if( dataSnapshot.getValue() != null ){
                     Empresa empresa = dataSnapshot.getValue(Empresa.class);
@@ -218,19 +186,15 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
                                 .load(urlImagemSelecionada)
                                 .into(foto);
                     }
-
                 }
-
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
     }
-
-
 
     public void validarDadosEmpresa(View view){
 
@@ -240,7 +204,6 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
         String categoria = editEmpresaCategoria.getText().toString();
         String tempo = editEmpresaTempo.getText().toString();
 
-
         if( !nome.isEmpty()){
             if( !taxa.isEmpty()){
                 if( !categoria.isEmpty()){
@@ -249,7 +212,6 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
                         Empresa empresa = new Empresa();
                         empresa.setIdUsuario( idUsuarioLogado );
                         empresa.setNome( nome );
-
                         empresa.setPrecoEntrega( Double.parseDouble(taxa) );
                         empresa.setCategoria(categoria);
                         empresa.setTempo( tempo );
@@ -269,14 +231,12 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
         }else{
             exibirMensagem("Digite um nome para a empresa");
         }
-
     }
 
     private void exibirMensagem(String texto){
         Toast.makeText(this, texto, Toast.LENGTH_SHORT)
                 .show();
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -303,7 +263,6 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
                         foto.setImageBitmap(imagem);
                         break;
                 }
-
 
 
                 if( imagem != null){
@@ -347,25 +306,17 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                         }
                     });
-
                         }
                     });
-
                 }
-
             }catch (Exception e){
                 e.printStackTrace();
             }
-
         }
 
     }
 
-
-
     private void inicializarComponentes() {
-
-
         editEmpresaNome = findViewById(R.id.editEmpresaNome);
         editEmpresaCategoria = findViewById(R.id.editEmpresaCategoria);
         editEmpresaTaxa = findViewById(R.id.editEmpresaTaxa);
@@ -373,23 +324,5 @@ public class ConfiguracoesEmpresaActivity extends AppCompatActivity {
         foto = findViewById(R.id.imagePerfilEmpresa);
         camera = findViewById(R.id.imageView3);
 
-
     }
-
-    /*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_empresa, menu);
-
-        for (int i = 0; i< menu.size(); i++){
-            Drawable drawable = menu.getItem(i).getIcon();
-            if (drawable != null){
-                drawable.mutate();
-                drawable.setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.SRC_ATOP);
-            }
-        }
-        return true;
-    }
-
-     */
 }
