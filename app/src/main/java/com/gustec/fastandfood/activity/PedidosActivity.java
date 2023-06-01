@@ -12,6 +12,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -40,6 +41,7 @@ public class PedidosActivity extends AppCompatActivity {
     private AlertDialog dialog;
     private DatabaseReference firebaseRef;
     private String idEmpresa;
+    private TextView mensagem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,9 +100,9 @@ public class PedidosActivity extends AppCompatActivity {
 
     private void recuperarPedidos() {
 
-        DatabaseReference pedidoRef = firebaseRef
-                .child("pedidos")
-                .child(idEmpresa);
+            DatabaseReference pedidoRef = firebaseRef
+                    .child("pedidos")
+                    .child(idEmpresa);
 
 
             Query pedidoPesquisa = pedidoRef.orderByChild("status")
@@ -112,17 +114,21 @@ public class PedidosActivity extends AppCompatActivity {
                     .setMessage("Carregando dados")
                     .setCancelable( false )
                     .build();
-            dialog.show();
+        recyclerPedidos.setVisibility(View.GONE);
 
 
             pedidoPesquisa.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+
                     pedidos.clear();
                     if( dataSnapshot.getValue() != null ){
                         for (DataSnapshot ds: dataSnapshot.getChildren()){
                             Pedido pedido = ds.getValue(Pedido.class);
+                            dialog.show();
+                            mensagem.setVisibility(View.GONE);
+                            recyclerPedidos.setVisibility(View.VISIBLE);
                             pedidos.add(pedido);
                         }
                         adapterPedido.notifyDataSetChanged();
@@ -136,14 +142,16 @@ public class PedidosActivity extends AppCompatActivity {
 
                 }
             });
+        }
 
 
-    }
+
 
 
 
 
     private void inicializarComponentes() {
         recyclerPedidos = findViewById(R.id.recyclerPedidos);
+        mensagem = findViewById(R.id.textPedidos);
     }
 }

@@ -18,4 +18,5 @@
     <string name="alimentos">Alimentos</string>
     <string name="_25_30_min">25-30 min</string>
     <string name="mais_taxa_de_entrega">\" taxa de entrega.\"</string>
+    <string name="sem_pedidos">Sem Pedidos!</string>
 </resources>
